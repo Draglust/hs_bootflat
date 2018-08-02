@@ -11,10 +11,10 @@
 |
 */
 
-Route::get('/', function () {
+/*Route::get('/', function () {
     return view('basic.template');
-});
-//Route::get('/','ShowController@showMain');
+});*/
+Route::get('/','ShowController@showMain');
 Route::get('/classesAll/{clase}', 'ShowController@showAll');
 //Route::get('/subasta','SubastaController@index');
 Route::get('/api','ApiController@index');
