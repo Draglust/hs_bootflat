@@ -8,44 +8,40 @@ use App\Models\Item;
 use App\Models\Owner;
 use App\Models\ClassSubclass;
 use App\Models\Price;
-use App\Http\Services\ServiceJson;
-use App\Http\Services\ServiceSubasta;
+use App\Http\Services\ServiceClase;
+use App\Http\Services\ServiceMoney;
+use App\Http\Services\ServiceIcono;
 use App\Http\Services\ServiceItem;
-use App\Http\Services\ServiceOwner;
 use Illuminate\Http\Request;
 
 class ShowController extends Controller {
 
+    protected $ServiceClase;
+
+    public function __construct(ServiceClase $ServiceClase,ServiceMoney $ServiceMoney,ServiceIcono $ServiceIcono,ServiceItem $ServiceItem)
+    {
+        $this->ServiceClase = $ServiceClase;
+        $this->ServiceMoney = $ServiceMoney;
+        $this->ServiceIcono = $ServiceIcono;
+        $this->ServiceItem = $ServiceItem;
+    }
+
 	public function showMain() {
-        $rawTotal = ClassSubclass::join('item', 'item.Class_Subclass_Id', '=', 'class_subclass.Id')->orderBy('Clase_nombre')->select('Clase_nombre','Subclase_nombre', \DB::raw('count(Item.Id) as Total'))->groupBy('Clase_nombre')->groupBy('Subclase_nombre')->get()->toArray();
-		$rawClases = ClassSubclass::groupBy('Clase_nombre')->groupBy('Subclase_nombre')->get(['Clase_nombre','Subclase_nombre','Clase_id','Subclase_id'])->toArray();
-        foreach ($rawClases as $loopKey => $loopValue) {
-			$clases[$loopValue['Clase_id']][$loopValue['Subclase_id']] = $loopValue;
-            $nombres[$loopValue['Clase_id']] = $loopValue['Clase_nombre'];
-		}
-        $iconos = array('Arma' =>'fa-bomb',
-                        'Armadura' => 'fa-shield',
-                        'Gema' => 'fa-diamond',
-                        'Consumible' => 'fa-flask',
-                        'Glifo' => 'fa-map-o',
-                        'Mascotas de duelo' => 'fa-twitter',
-                        'Miscelánea' => 'fa-trophy',
-                        'Misión' => 'fa-tags',
-                        'Objetos' => 'fa-umbrella',
-                        'Receta' => 'fa-spoon',
-                        'Recipiente' => 'fa-glass',
-                        'Habilidad comercial' => 'fa-handshake-o'
-                        );
+        $rawTotal = $this->ServiceClase->getTotalItems();
+
+        $retorno = $this->ServiceClase->getAllClasses();
 
 		return view('basic.template', array(
-            'clases' => $clases,
-            'items' => $rawTotal,
-            'nombres' => $nombres,
-            'iconos' => $iconos
+            'clases'  => $retorno['clases'],
+            'items'   => $rawTotal,
+            'nombres' => $retorno['nombres'],
+            'iconos'  => $retorno['iconos']
         ));
 
     }
     public function showAll($clase){
+        $retorno = $this->ServiceClase->getAllClasses();
+
     	$todosObjetos = Item::join('class_subclass', 'class_subclass.Id', '=', 'item.Class_Subclass_Id');
     	$todosObjetos->join('price', 'price.Item_id', '=', 'item.Id');
     	$todosObjetos->join('json', function($q)
@@ -82,13 +78,30 @@ class ShowController extends Controller {
             $fecha = $retornoObjetos[0]['Fecha'];
         }
 		foreach ($retornoObjetos as $key => $retornoObjeto) {
+            $Precio_medio = $this->ServiceMoney->coinTranslate($retornoObjeto['Precio_medio']);
+            unset($retornoObjeto['Precio_medio']);
+            $retornoObjeto['Precio_medio'] = $Precio_medio;
+            $Precio_minimo = $this->ServiceMoney->coinTranslate($retornoObjeto['Precio_minimo']);
+            unset($retornoObjeto['Precio_minimo']);
+            $retornoObjeto['Precio_minimo'] = $Precio_minimo;
+            $Precio_maximo = $this->ServiceMoney->coinTranslate($retornoObjeto['Precio_maximo']);
+            unset($retornoObjeto['Precio_maximo']);
+            $retornoObjeto['Precio_maximo'] = $Precio_maximo;
+
+            $retornoObjeto['Fecha'] = date('d-m-y H:i',strtotime($retornoObjeto['Fecha']));
+
+            $retornoObjeto['Icono'] = $this->ServiceIcono->cleanUrl($retornoObjeto['Icono']);
+            //$retornoObjeto['Nombre'] = $this->ServiceItem->shortText($retornoObjeto['Nombre'],20);
+
 			$objetos[$retornoObjeto['Faccion']][$retornoObjeto['Id']] = $retornoObjeto;
 		}
 
 		return view('show.allitems', array(
-            'objetos' => $objetos,
-            'clase' => $clase,
-            'fecha' => $fecha,
+            'clases'  => $retorno['clases'],
+            'nombres' => $retorno['nombres'],
+            'iconos'  => $retorno['iconos'],
+            'items' => $objetos,
+            'fecha' => $fecha
         ));
     }
 }

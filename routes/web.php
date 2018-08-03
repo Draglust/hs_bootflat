@@ -15,8 +15,8 @@
     return view('basic.template');
 });*/
 Route::get('/','ShowController@showMain');
-Route::get('/classesAll/{clase}', 'ShowController@showAll');
+Route::get('/allClass/{clase}', 'ShowController@showAll');
 //Route::get('/subasta','SubastaController@index');
 Route::get('/api','ApiController@index');
 //Route::get('/extract','ExtractController@treatJson');
-Route::get('/items','ApiController@items');
+Route::get('/api/items','ApiController@items');

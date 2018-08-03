@@ -13,8 +13,9 @@
                 <span class="glyphicon glyphicon-chevron-right"></span>
               </a>
               <li class="collapse" id="li_{{ $keyClase }}">
+                <a href="{{ url('allClass') }}/{{ $keyClase }}" class="list-group-item">Todos</a>
                 @foreach($clase as $keySub => $subclase)
-                  <a href="" class="list-group-item">{{ $subclase['Subclase_nombre'] }}</a>
+                  <a href="{{ url('class') }}/{{ $keySub }}" class="list-group-item">{{ $subclase['Subclase_nombre'] }}</a>
                 @endforeach
               </li>
             </li>
