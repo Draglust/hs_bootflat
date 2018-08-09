@@ -16,3 +16,4 @@
     <![endif]-->
     <script type="text/javascript" src="{{ asset('public/js/site.min.js') }}"></script>
     <script type="text/javascript" src="http://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
