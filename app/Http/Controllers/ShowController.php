@@ -48,7 +48,7 @@ class ShowController extends Controller {
     	$todosObjetos->join('json', function($q)
         {
             $q->on('json.Fecha','=', 'price.Fecha')
-                ->whereRaw('json.Id ='."(".\DB::raw('SELECT json.Id FROM json ORDER BY json.Fecha DESC LIMIT 1').")");
+                ->whereRaw('json.Id ='."(".\DB::raw('SELECT j.Id FROM json j INNER JOIN price p ON p.Fecha = j.Fecha ORDER BY j.Fecha DESC LIMIT 1').")");
         });
         
         $todosObjetos->leftJoin('auction', function($q)
@@ -115,7 +115,7 @@ class ShowController extends Controller {
         $todosObjetos->join('json', function($q)
         {
             $q->on('json.Fecha','=', 'price.Fecha')
-                ->whereRaw('json.Id ='."(".\DB::raw('SELECT json.Id FROM json ORDER BY json.Fecha DESC LIMIT 1').")");
+                ->whereRaw('json.Id ='."(".\DB::raw('SELECT j.Id FROM json j INNER JOIN price p ON p.Fecha = j.Fecha ORDER BY j.Fecha DESC LIMIT 1').")");
         });
         
         $todosObjetos->leftJoin('auction', function($q)
