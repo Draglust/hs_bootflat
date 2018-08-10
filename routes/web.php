@@ -20,5 +20,6 @@ Route::get('/class/{clase}/{subclase}', 'ShowController@showClass');
 Route::get('/item/{item}', 'ShowController@showItem');
 //Route::get('/subasta','SubastaController@index');
 Route::get('/api','ApiController@index');
+Route::get('/checkowner','ApiController@ownercheck');
 //Route::get('/extract','ExtractController@treatJson');
 Route::get('/api/items','ApiController@items');

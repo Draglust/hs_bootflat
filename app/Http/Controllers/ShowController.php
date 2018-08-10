@@ -44,8 +44,8 @@ class ShowController extends Controller {
         $retorno = $this->ServiceClase->getAllClasses();
 
     	$todosObjetos = Item::join('class_subclass', 'class_subclass.Id', '=', 'item.Class_Subclass_Id');
-    	$todosObjetos->join('price', 'price.Item_id', '=', 'item.Id');
-    	$todosObjetos->join('json', function($q)
+    	$todosObjetos->leftJoin('price', 'price.Item_id', '=', 'item.Id');
+    	$todosObjetos->leftJoin('json', function($q)
         {
             $q->on('json.Fecha','=', 'price.Fecha')
                 ->whereRaw('json.Id ='."(".\DB::raw('SELECT j.Id FROM json j INNER JOIN price p ON p.Fecha = j.Fecha WHERE j.Realm_pack = 2 ORDER BY j.Fecha DESC LIMIT 1').")");
@@ -111,8 +111,8 @@ class ShowController extends Controller {
         $retorno = $this->ServiceClase->getAllClasses();
 
         $todosObjetos = Item::join('class_subclass', 'class_subclass.Id', '=', 'item.Class_Subclass_Id');
-        $todosObjetos->join('price', 'price.Item_id', '=', 'item.Id');
-        $todosObjetos->join('json', function($q)
+        $todosObjetos->leftJoin('price', 'price.Item_id', '=', 'item.Id');
+        $todosObjetos->leftJoin('json', function($q)
         {
             $q->on('json.Fecha','=', 'price.Fecha')
                 ->whereRaw('json.Id ='."(".\DB::raw('SELECT j.Id FROM json j INNER JOIN price p ON p.Fecha = j.Fecha WHERE j.Realm_pack = 2 ORDER BY j.Fecha DESC LIMIT 1').")");

@@ -27,6 +27,7 @@ class ServiceOwner extends Service
         $todosRealms = Realm::all()->toArray();
         foreach($todosRealms as $reino){
             $arrayRealms[$reino['Nombre']] = $reino['Id'];
+            $slugRealms[$reino['Nombre']] = $reino['Slug'];
         }
 
         foreach ($subastas as $key => $subasta) {
@@ -49,8 +50,8 @@ class ServiceOwner extends Service
             foreach ($subastaOwners as $keyOwner => $ownerToInsert) {
                 set_time_limit(20);
                 try{
-
-                    $url = "https://eu.api.battle.net/wow/character/{$ownerToInsert['ReinoNombre']}/{$ownerToInsert['Nombre']}?locale=es_ES&apikey=8hw8e9kun6sf8kfh2qvjzw22b9wzzjek";
+                    $nombre = html_entity_decode(strtolower($ownerToInsert['Nombre']),ENT_NOQUOTES, 'UTF-8');
+                    $url = "https://eu.api.battle.net/wow/character/{$slugRealms[$ownerToInsert['ReinoNombre']]}/{$nombre}?locale=es_ES&apikey=8hw8e9kun6sf8kfh2qvjzw22b9wzzjek";
                     //echo $url;die();
                     $faccionExtraida = json_decode(ServiceWeb::curl($url), TRUE);
                     /*echo $url;
@@ -67,7 +68,7 @@ class ServiceOwner extends Service
                     $ownerToInsert['Faccion'] = $faccion['faction'];
                     $ownerToInsert['Realm_id'] = $arrayRealms[$ownerToInsert['ReinoNombre']];
                     unset($ownerToInsert['ReinoNombre']);
-                   \DB::table('owner')->insert($ownerToInsert);
+                    Owner::insert($ownerToInsert);
                 }
                 catch(\Exception $e){
                     echo $url;
@@ -146,5 +147,50 @@ class ServiceOwner extends Service
 
         return $subasta;
 
+    }
+
+    public function checkOwner(){
+        $todosRealms = Realm::all()->toArray();
+        foreach($todosRealms as $reino){
+            $arrayRealms[$reino['Id']] = $reino['Slug'];
+        }
+        $cambios = 0;
+
+        $todosLosOwner = Owner::where('Faccion','3')->get()->toArray();
+        if(isset($todosLosOwner) && count($todosLosOwner)>0){
+            foreach ($todosLosOwner as $keyOwner => $ownerToCheck) {
+                set_time_limit(20);
+                try{
+                    $nombre = html_entity_decode(strtolower($ownerToCheck['Nombre']),ENT_NOQUOTES, 'UTF-8');
+                    $url = "https://eu.api.battle.net/wow/character/{$arrayRealms[$ownerToCheck['Realm_id']]}/{$nombre}?locale=es_ES&apikey=8hw8e9kun6sf8kfh2qvjzw22b9wzzjek";
+
+                    $faccionExtraida = json_decode(ServiceWeb::curl($url), TRUE);
+
+                    echo '<pre>';
+                    print_r($faccionExtraida['faction']);
+                    echo '</pre>';
+                    /*echo $url;
+                    var_dump($faccionExtraida);
+                    die();*/
+                    //$faccionExtraida = json_decode(file_get_contents($url), TRUE);
+                    $faccion = $faccionExtraida;
+                    unset($faccionExtraida);
+
+                    if (isset($faccion['faction'])) {
+                      $duenio = Owner::where('Nombre',$ownerToCheck['Nombre'])->first();
+                      $duenio->Faccion = $faccion['faction'];
+                      $duenio->save();
+                      $cambios++;
+                    }
+
+                }
+                catch(\Exception $e){
+                    echo $url;
+                    echo $e->getMessage();
+                }
+
+            }
+        }
+        return $cambios;
     }
 }

@@ -106,4 +106,8 @@ class ApiController extends Controller {
             }
         }
     }
+    public function ownerCheck(){
+        $retorno = $this->ServiceOwner->checkOwner();
+        return $retorno;
+    }
 }
