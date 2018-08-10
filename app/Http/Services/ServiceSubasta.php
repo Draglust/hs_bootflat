@@ -251,7 +251,7 @@ class ServiceSubasta extends Service
         return TRUE;
     }
 
-    public function putSubastas($precios, $subastas) {
+    public function putSubastas($precios, $subastas, $slug) {
         $arrayOwners = array();
         $arrayIdOwners = array();
         $alreadyInserted = [];
@@ -263,7 +263,11 @@ class ServiceSubasta extends Service
             }
         }
         if(count($subastas)>0){
-            Auction::truncate();
+            $Realm_id = Realm::Slug($slug)->get(['Id'])->toArray();
+            foreach ($Realm_id as $key => $itemRealm) {
+                $realms[] = $itemRealm['Id'];
+            }
+            Auction::whereIn('Id',$realms)->delete();
         }
         $cutPrice = \Config::get('app.cut_price');
         foreach ($subastas as $keySubasta => $subasta) {

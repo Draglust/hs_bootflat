@@ -20,9 +20,15 @@
             <div class="panel panel-default" style="min-height: 550px">
               <div class="panel-heading">
                 <ul class="nav nav-pills nav-justified">
-                  <li><a data-toggle="tab" href="#c3">Sin facción</a></li>
-                  <li><a data-toggle="tab" href="#c0">Alianza</a></li>
-                  <li><a data-toggle="tab" href="#c1">Horda</a></li>
+                @if(!empty($items[3]))
+                <li><a data-toggle="tab" href="#c3">Sin facción</a></li>
+                @endif
+                @if(!empty($items[0]))
+                <li><a data-toggle="tab" href="#c0">Alianza</a></li>
+                @endif
+                @if(!empty($items[1]))
+                <li><a data-toggle="tab" href="#c1">Horda</a></li>
+                @endif
                 </ul>
               </div>
                 <div class="tab-content">

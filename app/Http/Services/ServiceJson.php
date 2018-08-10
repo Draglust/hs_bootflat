@@ -19,8 +19,15 @@ class ServiceJson extends Service
          * [Guardamos json si no existe]
          */
         if (!$jsonExists) {
+            preg_match_all("|\/data\/(.*)\?|U",$url, $salida, PREG_PATTERN_ORDER);
+            if(isset($salida[1][0])){
+                $slug = $salida[1][0];
+            }
+            else{
+                die('Slug no encontrado');
+            }
         	$fecha = date('Y-m-d H:i:s', $contenido['files'][0]['lastModified']/1000);
-        	$jsonGuardado = $this->saveJson($contenido['files'][0]['url'],$contenido['files'][0]['lastModified'],$fecha);
+        	$jsonGuardado = $this->saveJson($contenido['files'][0]['url'],$contenido['files'][0]['lastModified'],$fecha,$slug);
 
         	if($jsonGuardado){
         		return $jsonGuardado;
@@ -47,11 +54,13 @@ class ServiceJson extends Service
     	return $jsonExists;
     }
 
-    public function saveJson($url,$fecha_numerica,$fecha) {
+    public function saveJson($url,$fecha_numerica,$fecha,$slug) {
+        $realm_pack = Realm::Slug($slug)->get(['Realm_pack'])->toArray();
     	$newJson = new Json;
         $newJson->Url = $url;
         $newJson->Fecha_numerica = $fecha_numerica;
         $newJson->Fecha = $fecha;
+        $newJson->Realm_pack = $realm_pack[0]['Realm_pack'];
         $saved = $newJson->save();
         if(!$saved){
             return FALSE;

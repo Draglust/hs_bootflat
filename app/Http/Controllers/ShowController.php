@@ -48,7 +48,7 @@ class ShowController extends Controller {
     	$todosObjetos->join('json', function($q)
         {
             $q->on('json.Fecha','=', 'price.Fecha')
-                ->whereRaw('json.Id ='."(".\DB::raw('SELECT j.Id FROM json j INNER JOIN price p ON p.Fecha = j.Fecha ORDER BY j.Fecha DESC LIMIT 1').")");
+                ->whereRaw('json.Id ='."(".\DB::raw('SELECT j.Id FROM json j INNER JOIN price p ON p.Fecha = j.Fecha WHERE j.Realm_pack = 2 ORDER BY j.Fecha DESC LIMIT 1').")");
         });
         
         $todosObjetos->leftJoin('auction', function($q)
@@ -115,7 +115,7 @@ class ShowController extends Controller {
         $todosObjetos->join('json', function($q)
         {
             $q->on('json.Fecha','=', 'price.Fecha')
-                ->whereRaw('json.Id ='."(".\DB::raw('SELECT j.Id FROM json j INNER JOIN price p ON p.Fecha = j.Fecha ORDER BY j.Fecha DESC LIMIT 1').")");
+                ->whereRaw('json.Id ='."(".\DB::raw('SELECT j.Id FROM json j INNER JOIN price p ON p.Fecha = j.Fecha WHERE j.Realm_pack = 2 ORDER BY j.Fecha DESC LIMIT 1').")");
         });
         
         $todosObjetos->leftJoin('auction', function($q)
@@ -175,7 +175,7 @@ class ShowController extends Controller {
         ));
     }
 
-    public function showItem($clase){
+    public function showItem($id){
         $retorno = $this->ServiceClase->getAllClasses();
 
         $todosObjetos = Item::join('class_subclass', 'class_subclass.Id', '=', 'item.Class_Subclass_Id');
@@ -187,7 +187,7 @@ class ShowController extends Controller {
                 ->on('auction.Json_id', 'json.Id');
         });
         
-        $todosObjetos->where('item.Id',$clase);
+        $todosObjetos->where('item.Id',$id)->where('json.Realm_pack','2');
         $todosObjetos->groupBy('price.Fecha');
         $todosObjetos->orderBy('price.Fecha','ASC');
         $retornoObjetos = $todosObjetos->get(['item.Nombre','item.Id',
@@ -208,13 +208,16 @@ class ShowController extends Controller {
                         ])->toArray(); 
 
         foreach ($retornoObjetos as $key => $retornoObjeto) {
-            $Precio_medio = $this->ServiceMoney->coinTranslate($retornoObjeto['Precio_medio']);
+            //$Precio_medio = $this->ServiceMoney->coinTranslate($retornoObjeto['Precio_medio']);
+            $Precio_medio = $retornoObjeto['Precio_medio']/10000;
             unset($retornoObjeto['Precio_medio']);
             $retornoObjeto['Precio_medio'] = $Precio_medio;
-            $Precio_minimo = $this->ServiceMoney->coinTranslate($retornoObjeto['Precio_minimo']);
+            //$Precio_minimo = $this->ServiceMoney->coinTranslate($retornoObjeto['Precio_minimo']);
+            $Precio_minimo = $retornoObjeto['Precio_minimo']/10000;
             unset($retornoObjeto['Precio_minimo']);
             $retornoObjeto['Precio_minimo'] = $Precio_minimo;
-            $Precio_maximo = $this->ServiceMoney->coinTranslate($retornoObjeto['Precio_maximo']);
+            //$Precio_maximo = $this->ServiceMoney->coinTranslate($retornoObjeto['Precio_maximo']);
+            $Precio_maximo = $retornoObjeto['Precio_maximo']/10000;
             unset($retornoObjeto['Precio_maximo']);
             $retornoObjeto['Precio_maximo'] = $Precio_maximo;
 

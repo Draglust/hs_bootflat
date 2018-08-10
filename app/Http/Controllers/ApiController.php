@@ -34,7 +34,7 @@ class ApiController extends Controller {
         try{
             ini_set('memory_limit', '750M');
             $tiempo_inicial = microtime(true);
-            $url = "https://eu.api.battle.net/wow/auction/data/shen'dralar?locale=es_ES&apikey=8hw8e9kun6sf8kfh2qvjzw22b9wzzjek";
+            $url = "https://eu.api.battle.net/wow/auction/data/dun-modr?locale=es_ES&apikey=8hw8e9kun6sf8kfh2qvjzw22b9wzzjek";
             $retorno = $this->ServiceJson->getJson($url);
             $tiempo['getJson'] =   microtime(true) - $tiempo_inicial;
             $retornoItems = $this->ServiceItem->getAllItems();
@@ -67,7 +67,7 @@ class ApiController extends Controller {
                     $tiempo['putPrices'] =   microtime(true) - $tiempo_inicial;
                 }
                 if ($preciosInsertados) {
-                    $subastasReales = $this->ServiceSubasta->putSubastas($precios, $treatedSubastas);
+                    $subastasReales = $this->ServiceSubasta->putSubastas($precios, $treatedSubastas,'dun-modr');
                     $tiempo['putSubastas'] =   microtime(true) - $tiempo_inicial;
                 } else {
                     return 'No prices inserted.';

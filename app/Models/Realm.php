@@ -23,11 +23,16 @@ class Realm extends Eloquent {
     protected $primaryKey = 'Id';
     public $timestamps = false;
     protected $fillable = [
-        'Nombre'
+        'Nombre',
+        'Slug'
     ];
 
     public function scopeNombre($query, $nombre) {
         return $query->where('Nombre', '=', $nombre);
+    }
+
+    public function scopeSlug($query, $slug) {
+        return $query->where('Slug', '=', $slug);
     }
 
 }
